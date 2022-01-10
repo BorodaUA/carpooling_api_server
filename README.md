@@ -1,6 +1,6 @@
-## Carpooling fastapi
+## Carpooling API Server
 A pet project API to get familiar with fastapi.  
-This repository is a part of [carpooling_fastapi](https://todo.com) project.
+This repository is a part of [carpooling_fastapi](https://github.com/BorodaUA/carpooling_fastapi) project.
 ## Install & run
 ### How to use docker commands to run this Dockerfile:
 1. Create Docker image for the project

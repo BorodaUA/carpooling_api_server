@@ -4,8 +4,12 @@
 if [ -f .env ] && [ -s .env ]
 then
     export $(xargs <.env)
-    # Check for DEVELOPMENT_IDE env variable.
-    if [ "$DEVELOPMENT_IDE" = "vscode" ]; then
+    # Check for RUN_FOR_EVER env variable
+    if [ $RUN_FOR_EVER = "True" ]
+    then
         tail -f /dev/null
+    elif [  $RUN_FOR_EVER = "False" ]
+    then
+        python run.py
     fi
 fi
