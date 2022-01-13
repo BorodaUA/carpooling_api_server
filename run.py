@@ -1,5 +1,4 @@
 import uvicorn
-import os
 
 from app import create_app
 

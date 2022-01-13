@@ -1,7 +1,12 @@
 from fastapi import FastAPI
-from hello_world import hello_world_router
 
-def create_app():
+from common.constants import ApiVersion
+from users.routers import users_router
+
+
+def create_app() -> FastAPI:
     app = FastAPI()
-    app.include_router(hello_world_router)
+
+    app.include_router(users_router, prefix=f'/api/v{ApiVersion.V1.value}')
+
     return app
