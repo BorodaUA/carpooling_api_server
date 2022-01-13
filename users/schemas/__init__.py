@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
@@ -53,3 +54,4 @@ class UserOutputSchema(UserBaseSchema):
     """User Output schema for User model."""
     id: UUID = Field(description='Unique identifier of a user.')
     is_active: bool = Field(description='Boolean field whether a user is active or not.')
+    created_at: datetime = Field(description="Datetime of user's creation.")

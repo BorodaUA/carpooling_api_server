@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import Boolean, Column, String
+from sqlalchemy import Boolean, Column, DateTime, String, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -22,3 +22,6 @@ class User(Base):
     password = Column(String(UserModelConstants.CHAR_SIZE_64.value), nullable=True)
     phone_number = Column(String(UserModelConstants.CHAR_SIZE_64.value), nullable=False)
     is_active = Column(Boolean, nullable=True, default=UserModelConstants.FALSE.value)
+    created_at = Column(DateTime, server_default=func.now())
+
+    __mapper_args__ = {"eager_defaults": True}
