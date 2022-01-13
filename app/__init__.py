@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from common.constants import ApiVersion
+from common.constants.api import ApiVersion
 from users.routers import users_router
 
 

@@ -4,7 +4,7 @@ from sqlalchemy import Boolean, Column, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 
-from common.constants import UserModelConstants
+from common.constants.users import UserModelConstants
 
 Base = declarative_base()
 
