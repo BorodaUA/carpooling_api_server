@@ -19,7 +19,7 @@ class User(Base):
     last_name = Column(String(UserModelConstants.CHAR_SIZE_64.value), nullable=True)
     username = Column(String(UserModelConstants.CHAR_SIZE_64.value), nullable=False)
     email = Column(String(UserModelConstants.CHAR_SIZE_256.value), nullable=False)
-    password = Column(String(UserModelConstants.CHAR_SIZE_64.value), nullable=True)
+    password = Column(String(UserModelConstants.CHAR_SIZE_256.value), nullable=True)
     phone_number = Column(String(UserModelConstants.CHAR_SIZE_64.value), nullable=False)
     is_active = Column(Boolean, nullable=True, default=UserModelConstants.FALSE.value)
     created_at = Column(DateTime, server_default=func.now())

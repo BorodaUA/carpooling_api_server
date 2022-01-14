@@ -1,22 +1,21 @@
 from logging.config import fileConfig
 import asyncio
-import os
 
 from alembic import context
-from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
 from sqlalchemy.ext.asyncio import AsyncEngine
 
+from app.config import Settings
 from users.models import Base as UserBase
 
-load_dotenv()
+settings = Settings()
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
 section = config.config_ini_section
 
-config.set_section_option(section, "POSTGRES_DATABASE_URL", os.getenv('POSTGRES_DATABASE_URL'))
+config.set_section_option(section, "POSTGRES_DATABASE_URL", settings.POSTGRES_DATABASE_URL)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -52,6 +51,7 @@ def run_migrations_offline():
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        compare_type=True,
     )
 
     with context.begin_transaction():
@@ -59,7 +59,7 @@ def run_migrations_offline():
 
 
 def do_run_migrations(connection):
-    context.configure(connection=connection, target_metadata=target_metadata)
+    context.configure(connection=connection, target_metadata=target_metadata, compare_type=True,)
 
     with context.begin_transaction():
         context.run_migrations()

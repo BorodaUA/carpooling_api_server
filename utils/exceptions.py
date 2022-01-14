@@ -1,4 +1,4 @@
-"""Project exceptions module."""
+"""User exceptions module."""
 from fastapi import HTTPException
 
 

@@ -10,8 +10,6 @@ from users.services import UserService
 
 users_router = APIRouter(prefix='/users', tags=['Users'])
 
-users = ['john', 'bob']
-
 
 @users_router.get('/', response_model=list[UserOutputSchema])
 async def get_users(session: AsyncSession = Depends(get_session)):
