@@ -1,15 +1,22 @@
 from fastapi import APIRouter, Depends
 
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from auth.schemas import AuthUserInputSchema
+from auth.schemas import AuthUserInputSchema, AuthUserOutputSchema
 from auth.services import AuthService
-from db import get_session
+from users.schemas import UserOutputSchema
 
 auth_router = APIRouter(prefix='/auth', tags=['Auth'])
 
 
-@auth_router.post('/login')
-async def login(user: AuthUserInputSchema, session: AsyncSession = Depends(get_session)):
+@auth_router.post('/login', response_model=AuthUserOutputSchema)
+async def login(
+        user: AuthUserInputSchema,
+        auth_service: AuthService = Depends(),
+        ):
     """POST '/login' endpoint func, return auth header."""
-    return await AuthService(session=session).login(user)
+    return await auth_service.login(user)
+
+
+@auth_router.get('/me', response_model=UserOutputSchema)
+async def auth_me(auth_service: AuthService = Depends()):
+    """GET '/me' endpoint provides information about currently authenticated user."""
+    return await auth_service.me()

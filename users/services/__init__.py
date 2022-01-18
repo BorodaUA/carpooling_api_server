@@ -12,7 +12,7 @@ from sqlalchemy.future import select
 
 from users.models import User
 from users.schemas import UserInputSchema
-from utils.exceptions import UserNotFoundError
+from users.utils.exceptions import UserNotFoundError
 from utils.logging import setup_logging
 
 
