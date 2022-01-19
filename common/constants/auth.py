@@ -4,6 +4,12 @@ import enum
 class AuthJWTConstants(enum.Enum):
     """Auth JWT constants."""
     ALGORITHM_HS256 = 'HS256'
-    ACCESS_TOKEN_TYPE = 'bearer'
-    ACCESS_TOKEN_EXPIRE_60_MINUTES = 60
-    REFRESH_TOKEN_EXPIRE_30_DAYS = 30
+    ACCESS_TOKEN_NAME = 'access'
+    REFRESH_TOKEN_NAME = 'refresh'
+    # Time units.
+    DAYS = 'days'
+    MINUTES = 'minutes'
+    SECONDS = 'seconds'
+    TOKEN_EXPIRE_7 = 7
+    TOKEN_EXPIRE_30 = 30
+    TOKEN_EXPIRE_60 = 60

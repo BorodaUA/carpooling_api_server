@@ -1,3 +1,4 @@
+from datetime import timedelta
 import abc
 
 from fastapi import Depends, status
@@ -8,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.schemas import AuthUserInputSchema
 from auth.utils.exceptions import AuthUserInvalidPasswordException
+from common.constants.auth import AuthJWTConstants
 from db import get_session
 from users.services import UserService
 from utils.logging import setup_logging
@@ -33,6 +35,10 @@ class AbstractAuthService(metaclass=abc.ABCMeta):
         """Return currently authenticated user."""
         return await self._me()
 
+    async def logout(self) -> None:
+        """Unset credentials for currently authenticated user."""
+        return await self._logout()
+
     async def verify_password(self, password: str, password_hash: str) -> bool:
         """Return bool of verifying password with argon2 algorithm."""
         return await self._verify_password(password, password_hash)
@@ -46,7 +52,11 @@ class AbstractAuthService(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractclassmethod
-    async def _me(self):
+    async def _me(self) -> None:
+        pass
+
+    @abc.abstractclassmethod
+    async def _logout(self) -> None:
         pass
 
 
@@ -58,8 +68,19 @@ class AuthService(AbstractAuthService):
     async def _login(self, user: AuthUserInputSchema) -> None:
         db_user = await self.user_service.get_user_by_username(username=user.username)
         if await self.verify_password(password=user.password, password_hash=db_user.password):
-            access_token = self.Authorize.create_access_token(subject=user.username)
-            refresh_token = self.Authorize.create_refresh_token(subject=user.username)
+            access_token = await self._create_jwt_token(
+                subject=user.username,
+                token_type=AuthJWTConstants.ACCESS_TOKEN_NAME.value,
+                time_unit=AuthJWTConstants.MINUTES.value,
+                time_amount=AuthJWTConstants.TOKEN_EXPIRE_60.value,
+            )
+            refresh_token = await self._create_jwt_token(
+                subject=user.username,
+                token_type=AuthJWTConstants.REFRESH_TOKEN_NAME.value,
+                time_unit=AuthJWTConstants.DAYS.value,
+                time_amount=AuthJWTConstants.TOKEN_EXPIRE_7.value,
+
+            )
 
             self.Authorize.set_access_cookies(access_token)
             self.Authorize.set_refresh_cookies(refresh_token)
@@ -69,8 +90,22 @@ class AuthService(AbstractAuthService):
                 detail='Incorect username or password.',
             )
 
+    async def _create_jwt_token(self, subject: str, token_type: str, time_amount: int, time_unit: str) -> str:
+        """Return access or refresh token with set parameters."""
+        CREATE_TOKEN_METHODS = {
+            'access': self.Authorize.create_access_token,
+            'refresh': self.Authorize.create_refresh_token,
+        }
+        expires_time = timedelta(**{time_unit: time_amount})
+        return CREATE_TOKEN_METHODS[token_type](subject=subject, expires_time=expires_time)
+
     async def _me(self) -> None:
         self.Authorize.jwt_required()
         current_user = self.Authorize.get_jwt_subject()
         user = await self.user_service.get_user_by_username(current_user)
         return user
+
+    async def _logout(self) -> None:
+        self.Authorize.jwt_required()
+        self.Authorize.unset_jwt_cookies()
+        return {'message': 'Successfully logout.'}

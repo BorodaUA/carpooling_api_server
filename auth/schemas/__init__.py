@@ -28,3 +28,7 @@ class AuthUserInputSchema(AuthUserBaseSchema):
 class AuthUserOutputSchema(BaseModel):
     access_token: str
     refresh_token: str
+
+
+class AuthUserLogoutSchema(BaseModel):
+    message: str
