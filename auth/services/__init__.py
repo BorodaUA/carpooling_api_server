@@ -43,6 +43,10 @@ class AbstractAuthService(metaclass=abc.ABCMeta):
         """Return bool of verifying password with argon2 algorithm."""
         return await self._verify_password(password, password_hash)
 
+    async def refresh_token(self) -> None:
+        """Refresh and return access and refresh tokens."""
+        return await self._refresh_token()
+
     @abc.abstractclassmethod
     async def _login(user: AuthUserInputSchema) -> None:
         pass
@@ -57,6 +61,10 @@ class AbstractAuthService(metaclass=abc.ABCMeta):
 
     @abc.abstractclassmethod
     async def _logout(self) -> None:
+        pass
+
+    @abc.abstractclassmethod
+    async def _refresh_token(self) -> None:
         pass
 
 
@@ -109,3 +117,22 @@ class AuthService(AbstractAuthService):
         self.Authorize.jwt_required()
         self.Authorize.unset_jwt_cookies()
         return {'message': 'Successfully logout.'}
+
+    async def _refresh_token(self) -> None:
+        self.Authorize.jwt_refresh_token_required()
+        current_user = self.Authorize.get_jwt_subject()
+        access_token = await self._create_jwt_token(
+            subject=current_user,
+            token_type=AuthJWTConstants.ACCESS_TOKEN_NAME.value,
+            time_unit=AuthJWTConstants.MINUTES.value,
+            time_amount=AuthJWTConstants.TOKEN_EXPIRE_60.value,
+        )
+        refresh_token = await self._create_jwt_token(
+            subject=current_user,
+            token_type=AuthJWTConstants.REFRESH_TOKEN_NAME.value,
+            time_unit=AuthJWTConstants.DAYS.value,
+            time_amount=AuthJWTConstants.TOKEN_EXPIRE_7.value,
+        )
+        self.Authorize.set_access_cookies(access_token)
+        self.Authorize.set_refresh_cookies(refresh_token)
+        return {'access_token': access_token, 'refresh_token': refresh_token}

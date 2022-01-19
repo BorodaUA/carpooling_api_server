@@ -23,3 +23,9 @@ async def auth_me(auth_service: AuthService = Depends()):
 async def logout(auth_service: AuthService = Depends()):
     """POST '/logout' endpoint logging out currently authenticated user."""
     return await auth_service.logout()
+
+
+@auth_router.post('/refresh', response_model=AuthUserOutputSchema)
+async def refresh(auth_service: AuthService = Depends()):
+    """POST '/refresh' endpoint refreshing user's access and refresh tokens."""
+    return await auth_service.refresh_token()
